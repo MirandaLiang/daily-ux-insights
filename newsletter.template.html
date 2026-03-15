@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily UX Insights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #000000;
+            --paper: #ffffff;
+            --paper-dark: #f2f2f2;
+            --accent: #1A8917;
+            --accent-light: #d4edcc;
+            --muted: #6b6b6b;
+            --rule: #d0d0d0;
+            --cn-tint: #f9fbf9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'DM Mono', monospace;
+            font-weight: 300;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* clean white surface */
+
+        .wrapper {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 32px 80px;
+        }
+
+        /* ── HEADER ── */
+        header {
+            padding: 56px 0 0;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .masthead-top {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            border-top: 3px solid var(--ink);
+            padding-top: 14px;
+            margin-bottom: 4px;
+        }
+
+        .masthead-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .masthead-date {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(52px, 9vw, 88px);
+            font-weight: 900;
+            line-height: 0.92;
+            letter-spacing: -0.02em;
+            margin: 12px 0 0;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .tagline-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 18px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .tagline-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent); /* Medium green */
+            flex-shrink: 0;
+        }
+
+        .tagline {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .issue-num {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        /* ── ARTICLE CARD ── */
+        .article {
+            margin-top: 48px;
+            animation: fadeUp 0.7s ease 0.15s both;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            font-weight: 400;
+            border-radius: 2px;
+        }
+
+        .tag::before {
+            content: '▸';
+            font-size: 8px;
+        }
+
+        .meta-rule {
+            flex: 1;
+            height: 1px;
+            background: var(--rule);
+        }
+
+        /* EN section */
+        .en-block {
+            padding: 32px 0 36px;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .en-block h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(26px, 4.5vw, 38px);
+            font-weight: 700;
+            line-height: 1.18;
+            letter-spacing: -0.01em;
+            margin-bottom: 16px;
+            max-width: 620px;
+        }
+
+        .en-block h2 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .en-body {
+            font-family: 'DM Mono', monospace;
+            font-size: 13.5px;
+            line-height: 1.85;
+            color: #3a3630;
+            max-width: 580px;
+            font-weight: 300;
+        }
+
+        .pull-quote {
+            border-left: 3px solid var(--accent);
+            padding: 12px 0 12px 20px;
+            margin: 28px 0;
+            color: var(--muted);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 17px;
+            line-height: 1.5;
+            max-width: 520px;
+        }
+
+        /* CN section */
+        .cn-block {
+            background: var(--cn-tint);
+            padding: 28px 32px;
+            margin-top: 32px;
+            position: relative;
+            border: 1px solid var(--rule);
+        }
+
+        .cn-block::before {
+            content: '中';
+            position: absolute;
+            top: -14px;
+            left: 32px;
+            background: var(--paper);
+            padding: 0 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            color: var(--muted);
+        }
+
+        .cn-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .cn-block h2 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            color: var(--ink);
+        }
+
+        .cn-body {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13px;
+            line-height: 2;
+            color: #5a5248;
+            font-weight: 300;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            margin-top: 64px;
+            padding-top: 20px;
+            border-top: 1px solid var(--rule);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeUp 0.8s ease 0.3s both;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--muted);
+        }
+
+        .footer-meta {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--rule);
+        }
+
+        /* ── DECORATIVE RULE ── */
+        .ornamental-rule {
+            text-align: center;
+            color: var(--rule);
+            font-size: 13px;
+            letter-spacing: 0.6em;
+            margin: 40px 0;
+            user-select: none;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── HOVER STATE ── */
+        .article:hover .en-block h2 {
+            text-decoration: underline;
+            text-decoration-color: var(--accent);
+            text-decoration-thickness: 2px;
+            text-underline-offset: 5px;
+            cursor: default;
+        }
+
+        @media (max-width: 520px) {
+            .wrapper { padding: 0 20px 60px; }
+            .cn-block { padding: 24px 20px; }
+            .cn-block::before { left: 20px; }
+            footer { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <header>
+        <div class="masthead-top">
+            <span class="masthead-label">Staff Designer Edition</span>
+            <span class="masthead-date">March 15, 2026 · Issue 047</span>
+        </div>
+        <h1>Daily<br><em>UX</em><br>Insights</h1>
+        <div class="tagline-row">
+            <div class="tagline-dot"></div>
+            <span class="tagline">Curated AI & UX design news</span>
+            <span class="issue-num">Vol. II</span>
+        </div>
+    </header>
+
+    <main>
+        <article class="article">
+
+            <div class="article-meta">
+                <span class="tag">AI Design</span>
+                <div class="meta-rule"></div>
+            </div>
+
+            <div class="en-block">
+                <h2>The Shift from Deterministic<br>to <em>Probabilistic</em> UI</h2>
+
+                <p class="en-body">
+                    As generative AI becomes integrated into core products, designers must move away from fixed layouts toward interfaces that can handle uncertainty and dynamic generation.
+                </p>
+
+                <div class="pull-quote">
+                    "The interface is no longer a fixed stage — it is a living negotiation between system intent and user context."
+                </div>
+
+                <p class="en-body">
+                    This shift demands new mental models: loading states that feel alive, error boundaries that maintain trust, and layouts that compose gracefully from generated content rather than dictating it.
+                </p>
+            </div>
+
+            <div class="cn-block">
+                <div class="cn-label">Chinese · 中文版</div>
+                <h2>从确定性 UI 向概率性 UI 的转变</h2>
+                <p class="cn-body">随着生成式 AI 集成到核心产品中，设计师必须从固定布局转向能够处理不确定性和动态生成的界面。这一转变要求全新的心智模型：充满生命感的加载状态、维护用户信任的错误边界，以及能够优雅地适配生成内容的布局系统。</p>
+            </div>
+
+        </article>
+
+        <div class="ornamental-rule">· · · ✦ · · ·</div>
+    </main>
+
+    <footer>
+        <span class="footer-brand">Daily UX Insights</span>
+        <span class="footer-meta">FOR STAFF DESIGNERS · CURATED DAILY</span>
+    </footer>
+
+</div>
+</body>
+</html>
