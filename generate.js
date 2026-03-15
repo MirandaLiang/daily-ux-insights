@@ -2,7 +2,7 @@ const fs = require("fs");
 const https = require("https");
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-1.5-flash-latest";
+const MODEL = "gemini-2.5-flash";
 
 // ── Call Gemini API ────────────────────────────────────────────────────────────
 async function callGemini(prompt) {
