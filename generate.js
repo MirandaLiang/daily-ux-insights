@@ -169,9 +169,9 @@ function buildHTML(stories, pastDays) {
   // Replace the single article block with all 10 articles
   const allArticles = stories.map((story, i) => buildArticleCard(story, i === 0)).join("\n");
 
-  html = html.replace(
-    /<main>[\s\S]*?<\/main>/,
-    `<main>\n${allArticles}\n</main>`
+html = html.replace(
+    "<!-- STORIES_PLACEHOLDER -->",
+    allArticles
   );
 
   // Archive styles + section
