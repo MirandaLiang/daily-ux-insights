@@ -17,6 +17,21 @@
             --muted: #6b6b6b;
             --rule: #d0d0d0;
             --cn-tint: #f9fbf9;
+            --en-body-color: #3a3630;
+            --cn-body-color: #5a5248;
+        }
+
+        [data-theme="dark"] {
+            --ink: #e8e6e0;
+            --paper: #111110;
+            --paper-dark: #1a1a18;
+            --accent: #3db839;
+            --accent-light: #1a3319;
+            --muted: #888680;
+            --rule: #2e2e2c;
+            --cn-tint: #161614;
+            --en-body-color: #b0ada6;
+            --cn-body-color: #888680;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,9 +44,29 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* clean white surface */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 999;
+            background: var(--paper);
+            border: 1px solid var(--rule);
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            padding: 7px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 2px;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
         .wrapper {
             max-width: 780px;
@@ -39,7 +74,6 @@
             padding: 0 32px 80px;
         }
 
-        /* ── HEADER ── */
         header {
             padding: 56px 0 0;
             animation: fadeUp 0.6s ease both;
@@ -95,7 +129,7 @@
         .tagline-dot {
             width: 6px; height: 6px;
             border-radius: 50%;
-            background: var(--accent); /* Medium green */
+            background: var(--accent);
             flex-shrink: 0;
         }
 
@@ -113,7 +147,6 @@
             letter-spacing: 0.1em;
         }
 
-        /* ── ARTICLE CARD ── */
         .article {
             margin-top: 48px;
             animation: fadeUp 0.7s ease 0.15s both;
@@ -152,7 +185,6 @@
             background: var(--rule);
         }
 
-        /* EN section */
         .en-block {
             padding: 32px 0 36px;
             border-bottom: 1px solid var(--rule);
@@ -177,7 +209,7 @@
             font-family: 'DM Mono', monospace;
             font-size: 13.5px;
             line-height: 1.85;
-            color: #3a3630;
+            color: var(--en-body-color);
             max-width: 580px;
             font-weight: 300;
         }
@@ -194,7 +226,6 @@
             max-width: 520px;
         }
 
-        /* CN section */
         .cn-block {
             background: var(--cn-tint);
             padding: 28px 32px;
@@ -238,11 +269,10 @@
             font-family: 'Noto Serif SC', serif;
             font-size: 13px;
             line-height: 2;
-            color: #5a5248;
+            color: var(--cn-body-color);
             font-weight: 300;
         }
 
-        /* ── FOOTER ── */
         footer {
             margin-top: 64px;
             padding-top: 20px;
@@ -266,7 +296,6 @@
             color: var(--rule);
         }
 
-        /* ── DECORATIVE RULE ── */
         .ornamental-rule {
             text-align: center;
             color: var(--rule);
@@ -276,13 +305,11 @@
             user-select: none;
         }
 
-        /* ── ANIMATIONS ── */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(18px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── HOVER STATE ── */
         .article:hover .en-block h2 {
             text-decoration: underline;
             text-decoration-color: var(--accent);
@@ -300,12 +327,13 @@
     </style>
 </head>
 <body>
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">○ DARK</button>
 <div class="wrapper">
 
     <header>
         <div class="masthead-top">
             <span class="masthead-label">Staff Designer Edition</span>
-            <span class="masthead-date">March 16, 2026 · Issue 047</span>
+            <span class="masthead-date">March 15, 2026 · Issue 047</span>
         </div>
         <h1>Daily<br><em>UX</em><br>Insights</h1>
         <div class="tagline-row">
@@ -316,38 +344,7 @@
     </header>
 
     <main>
-        <article class="article">
-
-            <div class="article-meta">
-                <span class="tag">AI Design</span>
-                <div class="meta-rule"></div>
-            </div>
-
-            <div class="en-block">
-                <h2>Design for Adaptive AI Experiences, Not Static <em>Screens</em></h2>
-
-                <p class="en-body">
-                    As AI capabilities mature, the focus shifts from designing static screens to crafting dynamic, adaptive experiences. AI-powered products learn from user behavior and context, demanding designers think in terms of evolving systems, not fixed layouts. This requires a deeper understanding of data flows, personalization algorithms, and ethical considerations to build truly intelligent interfaces.
-                </p>
-
-                <div class="pull-quote">
-                    "The future of UX isn't about pixels on a screen; it's about designing intelligent partners that adapt and evolve with the user."
-                </div>
-
-                <p class="en-body">
-                    Designers must embrace system thinking and data literacy, collaborating closely with AI engineers and data scientists. Our role evolves to orchestrating intelligent interactions and ensuring user trust in these adaptive systems.
-                </p>
-            </div>
-
-            <div class="cn-block">
-                <div class="cn-label">Chinese · 中文版</div>
-                <h2>设计自适应AI体验，而非静态屏幕</h2>
-                <p class="cn-body">随着AI能力日趋成熟，设计重心正从静态屏幕转向动态、自适应的体验。AI驱动的产品会从用户行为和语境中学习，这要求设计师以演进系统而非固定布局的思维进行设计。这需要更深入地理解数据流、个性化算法和伦理考量，以构建真正智能的界面。</p>
-            </div>
-
-        </article>
-
-        <div class="ornamental-rule">· · · ✦ · · ·</div>
+    <!-- STORIES_PLACEHOLDER -->
     </main>
 
     <footer>
@@ -356,110 +353,25 @@
     </footer>
 
 </div>
-
-  <style>
-    .archive-section {
-      margin-top: 64px;
-      animation: fadeUp 0.9s ease 0.4s both;
+<script>
+    const btn = document.getElementById('theme-btn');
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        btn.textContent = '● LIGHT';
     }
-    .archive-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 28px;
+    function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            btn.textContent = '○ DARK';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            btn.textContent = '● LIGHT';
+        }
     }
-    .archive-header-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .archive-header-rule {
-      flex: 1;
-      height: 1px;
-      background: var(--rule);
-    }
-    .archive-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .archive-card {
-      border: 1px solid var(--rule);
-      padding: 20px;
-      background: var(--paper);
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .archive-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .archive-card-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .archive-tag {
-      background: var(--accent);
-      color: #fff;
-      font-family: 'DM Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 2px;
-    }
-    .archive-date {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      color: var(--muted);
-    }
-    .archive-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.3;
-      margin-bottom: 8px;
-      color: var(--ink);
-    }
-    .archive-body {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      line-height: 1.7;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .archive-title-zh {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 11px;
-      color: var(--muted);
-      border-top: 1px dashed var(--rule);
-      padding-top: 10px;
-    }
-  </style>
-
-
-  <style>
-    .archive-section { margin-top: 64px; animation: fadeUp 0.9s ease 0.4s both; }
-    .archive-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
-    .archive-header-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-    .archive-header-rule { flex: 1; height: 1px; background: var(--rule); }
-    .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .archive-card { border: 1px solid var(--rule); padding: 20px; background: var(--paper); transition: border-color 0.2s, box-shadow 0.2s; }
-    .archive-card:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-    .archive-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .archive-tag { background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
-    .archive-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
-    .archive-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; color: var(--ink); }
-    .archive-body { font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--muted); margin-bottom: 12px; }
-    .archive-footer { border-top: 1px dashed var(--rule); padding-top: 10px; }
-    .archive-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); display: block; margin-bottom: 6px; }
-    .archive-title-zh { font-family: 'Noto Serif SC', serif; font-size: 11px; color: var(--muted); }
-    .article--first { margin-top: 48px; }
-  </style>
-
+</script>
 </body>
 </html>
