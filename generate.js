@@ -164,7 +164,7 @@ function buildHTML(stories, pastDays) {
   const today = new Date().toISOString().split("T")[0];
 
   // Update date
-  html = html.replace(/March 15, 2026/g, formatDate(today));
+html = html.replace(/\w+ \d+, \d{4} · Issue \d+/g, formatDate(today) + ' · Issue 047');
 
   // Replace the single article block with all 10 articles
   const allArticles = stories.map((story, i) => buildArticleCard(story, i === 0)).join("\n");
