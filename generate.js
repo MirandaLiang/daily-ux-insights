@@ -215,15 +215,12 @@ html = html.replace(
   const alreadyToday = archive.find(e => e.date === today);
   let todayStories;
 
-  if (alreadyToday) {
-    console.log("Today already in archive, reusing stories.");
-    todayStories = alreadyToday.stories || [alreadyToday.story];
+if (alreadyToday) {
     archive = archive.filter(e => e.date !== today);
-  } else {
-    console.log("Fetching 10 stories from Gemini...");
-    todayStories = await fetchTenStories();
-    console.log(`Fetched ${todayStories.length} stories.`);
   }
+  console.log("Fetching 10 fresh stories from Gemini...");
+  todayStories = await fetchTenStories();
+  console.log(`Fetched ${todayStories.length} stories.`);
 
   // Add today to top
   archive.unshift({ date: today, stories: todayStories });
