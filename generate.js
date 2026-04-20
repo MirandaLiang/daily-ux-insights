@@ -52,14 +52,12 @@ async function callGemini(prompt) {
 async function fetchWithRetry(prompt, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // 尝试调用基础的 callGemini 函数
       return await callGemini(prompt);
     } catch (error) {
       console.warn(`[Warning] Attempt ${attempt} failed: ${error.message}`);
       if (attempt === maxRetries) {
         throw new Error(`All ${maxRetries} attempts failed. Last error: ${error.message}`);
       }
-      // 遇到高峰期，等待时间递增：5秒, 10秒...
       const waitTime = attempt * 5000; 
       console.log(`Waiting ${waitTime / 1000} seconds before retrying...`);
       await sleep(waitTime);
@@ -90,7 +88,6 @@ Return ONLY a valid JSON array with exactly 10 objects. No markdown, no code fen
 
 Topics to cover across the 10 stories (one each): generative UI patterns, AI-assisted design tools, voice and multimodal interfaces, design systems for AI products, ethical AI design, spatial computing UX, motion and animation trends, accessibility in AI, design leadership in AI era, emerging UX research methods.`;
 
-  // 这里使用带有重试机制的函数
   const raw = await fetchWithRetry(prompt);
   const clean = raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
 
@@ -208,4 +205,57 @@ function buildHTML(stories, pastDays) {
     .archive-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .archive-tag { background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
     .archive-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
-    .archive-title { font-family:
+    .archive-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; color: var(--ink); }
+    .archive-body { font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--muted); margin-bottom: 12px; }
+    .archive-footer { border-top: 1px dashed var(--rule); padding-top: 10px; }
+    .archive-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); display: block; margin-bottom: 6px; }
+    .archive-title-zh { font-family: 'Noto Serif SC', serif; font-size: 11px; color: var(--muted); }
+    .article--first { margin-top: 48px; }
+  </style>`;
+
+  const archiveHTML = buildArchiveCards(pastDays);
+  html = html.replace("</body>", archiveStyles + "\n" + archiveHTML + "\n</body>");
+
+  return html;
+}
+
+// ── 8. Main ────────────────────────────────────────────────────────────────────
+(async () => {
+  const today = new Date().toISOString().split("T")[0];
+
+  // Load existing archive
+  let archive = [];
+  if (fs.existsSync("archive.json")) {
+    archive = JSON.parse(fs.readFileSync("archive.json", "utf8"));
+  }
+
+  // Check if today already exists
+  const alreadyToday = archive.find(e => e.date === today);
+  let todayStories;
+
+  if (alreadyToday) {
+    archive = archive.filter(e => e.date !== today);
+  }
+  
+  console.log("Fetching 10 fresh stories from Gemini...");
+  todayStories = await fetchTenStories();
+  console.log(`Fetched ${todayStories.length} stories.`);
+
+  // Add today to top
+  archive.unshift({ date: today, stories: todayStories });
+
+  // Keep last 30 days
+  archive = archive.slice(0, 30);
+
+  // Save archive
+  fs.writeFileSync("archive.json", JSON.stringify(archive, null, 2), "utf8");
+  console.log(`Archive updated: ${archive.length} days stored.`);
+
+  // Past days = everything except today
+  const pastDays = archive.slice(1);
+
+  // Build HTML
+  const html = buildHTML(todayStories, pastDays);
+  fs.writeFileSync("index.html", html, "utf8");
+  console.log("index.html written successfully!");
+})();
