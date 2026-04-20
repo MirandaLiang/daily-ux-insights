@@ -2,8 +2,8 @@ name: Daily Newsletter
 
 on:
   schedule:
-    - cron: "0 8 * * *"   # Every day at 8:00 AM UTC
-  workflow_dispatch:        # Also allow manual trigger from GitHub UI
+    - cron: "6 8 * * *"   # Every day at 8:06 AM GMT-4
+  workflow_dispatch:      # <- 只需要在这里留一个，和 schedule 保持平级缩进
 
 jobs:
   generate:
