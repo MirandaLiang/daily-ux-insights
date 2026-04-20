@@ -3,8 +3,9 @@ const https = require("https");
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = "gemini-2.5-flash";
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ── Call Gemini API ────────────────────────────────────────────────────────────
+// ── 1. Call Gemini API (基础网络请求) ───────────────────────────────────────
 async function callGemini(prompt) {
   const body = JSON.stringify({
     contents: [{ parts: [{ text: prompt }] }],
@@ -47,7 +48,26 @@ async function callGemini(prompt) {
   });
 }
 
-// ── Fetch 10 stories from Gemini in one call ───────────────────────────────────
+// ── 2. Retry Logic (自动重试包装器) ──────────────────────────────────────────
+async function fetchWithRetry(prompt, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // 尝试调用基础的 callGemini 函数
+      return await callGemini(prompt);
+    } catch (error) {
+      console.warn(`[Warning] Attempt ${attempt} failed: ${error.message}`);
+      if (attempt === maxRetries) {
+        throw new Error(`All ${maxRetries} attempts failed. Last error: ${error.message}`);
+      }
+      // 遇到高峰期，等待时间递增：5秒, 10秒...
+      const waitTime = attempt * 5000; 
+      console.log(`Waiting ${waitTime / 1000} seconds before retrying...`);
+      await sleep(waitTime);
+    }
+  }
+}
+
+// ── 3. Fetch 10 stories (业务逻辑) ───────────────────────────────────────────
 async function fetchTenStories() {
   const today = new Date().toISOString().split("T")[0];
 
@@ -70,7 +90,8 @@ Return ONLY a valid JSON array with exactly 10 objects. No markdown, no code fen
 
 Topics to cover across the 10 stories (one each): generative UI patterns, AI-assisted design tools, voice and multimodal interfaces, design systems for AI products, ethical AI design, spatial computing UX, motion and animation trends, accessibility in AI, design leadership in AI era, emerging UX research methods.`;
 
-  const raw = await callGemini(prompt);
+  // 这里使用带有重试机制的函数
+  const raw = await fetchWithRetry(prompt);
   const clean = raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
 
   try {
@@ -84,7 +105,7 @@ Topics to cover across the 10 stories (one each): generative UI patterns, AI-ass
   }
 }
 
-// ── Format date ───────────────────────────────────────────────────────────────
+// ── 4. Format date ────────────────────────────────────────────────────────────
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric", timeZone: "UTC"
@@ -99,7 +120,7 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// ── Build a single full article card ─────────────────────────────────────────
+// ── 5. Build a single full article card ───────────────────────────────────────
 function buildArticleCard(story, isFirst) {
   const words = escapeHtml(story.title_en).split(" ");
   const lastWord = words.pop();
@@ -126,7 +147,7 @@ function buildArticleCard(story, isFirst) {
     <div class="ornamental-rule">· · · ✦ · · ·</div>`;
 }
 
-// ── Build archive cards HTML ───────────────────────────────────────────────────
+// ── 6. Build archive cards HTML ────────────────────────────────────────────────
 function buildArchiveCards(pastDays) {
   if (!pastDays || pastDays.length === 0) return "";
 
@@ -158,19 +179,19 @@ function buildArchiveCards(pastDays) {
     </section>`;
 }
 
-// ── Build full HTML ────────────────────────────────────────────────────────────
+// ── 7. Build full HTML ─────────────────────────────────────────────────────────
 function buildHTML(stories, pastDays) {
   let html = fs.readFileSync("newsletter.template.html", "utf8");
   const today = new Date().toISOString().split("T")[0];
 
   // Update date
-html = html.replace(/\w+ \d+, \d{4} · Issue \d+/g, formatDate(today) + ' · Issue 047');
+  html = html.replace(/\w+ \d+, \d{4} · Issue \d+/g, formatDate(today) + ' · Issue 047');
 
   // Replace the single article block with all 10 articles
   const allArticles = stories.map((story, i) => buildArticleCard(story, i === 0)).join("\n");
 
-html = html.replace(
-    "<!-- STORIES_PLACEHOLDER -->",
+  html = html.replace(
+    "",
     allArticles
   );
 
@@ -187,56 +208,4 @@ html = html.replace(
     .archive-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .archive-tag { background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
     .archive-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
-    .archive-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; color: var(--ink); }
-    .archive-body { font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--muted); margin-bottom: 12px; }
-    .archive-footer { border-top: 1px dashed var(--rule); padding-top: 10px; }
-    .archive-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); display: block; margin-bottom: 6px; }
-    .archive-title-zh { font-family: 'Noto Serif SC', serif; font-size: 11px; color: var(--muted); }
-    .article--first { margin-top: 48px; }
-  </style>`;
-
-  const archiveHTML = buildArchiveCards(pastDays);
-  html = html.replace("</body>", archiveStyles + "\n" + archiveHTML + "\n</body>");
-
-  return html;
-}
-
-// ── Main ───────────────────────────────────────────────────────────────────────
-(async () => {
-  const today = new Date().toISOString().split("T")[0];
-
-  // Load existing archive
-  let archive = [];
-  if (fs.existsSync("archive.json")) {
-    archive = JSON.parse(fs.readFileSync("archive.json", "utf8"));
-  }
-
-  // Check if today already exists
-  const alreadyToday = archive.find(e => e.date === today);
-  let todayStories;
-
-if (alreadyToday) {
-    archive = archive.filter(e => e.date !== today);
-  }
-  console.log("Fetching 10 fresh stories from Gemini...");
-  todayStories = await fetchTenStories();
-  console.log(`Fetched ${todayStories.length} stories.`);
-
-  // Add today to top
-  archive.unshift({ date: today, stories: todayStories });
-
-  // Keep last 30 days
-  archive = archive.slice(0, 30);
-
-  // Save archive
-  fs.writeFileSync("archive.json", JSON.stringify(archive, null, 2), "utf8");
-  console.log(`Archive updated: ${archive.length} days stored.`);
-
-  // Past days = everything except today
-  const pastDays = archive.slice(1);
-
-  // Build HTML
-  const html = buildHTML(todayStories, pastDays);
-  fs.writeFileSync("index.html", html, "utf8");
-  console.log("index.html written successfully!");
-})();
+    .archive-title { font-family:
